@@ -47,7 +47,8 @@ if (isset($_GET['removeIndex'])) {
 	$removeIndex = $_GET['removeIndex'];
 	unset($items[$removeIndex]);
 }
- 
+
+save_file($items); 
 
 ?>
 
