@@ -43,6 +43,12 @@ if(isset($_POST['Add_Item'])){
 
 save_file($items); 
 
+if (isset($_GET['removeIndex'])) {
+	$removeIndex = $_GET['removeIndex'];
+	unset($items[$removeIndex]);
+}
+ 
+
 ?>
 
 
@@ -56,8 +62,8 @@ save_file($items);
 		<h2>TODO List</h2>
 		<ul>
 			<?php 
-				foreach($items as $item) {
-					echo "<li>$item</li>" . PHP_EOL;
+				foreach($items as $key => $item) {
+					echo "<li>{$item}<a href=\"todo_list.php?removeIndex={$key}\"> Remove Item </a></li>" . PHP_EOL;
 				}
 			?>
 		</ul>
@@ -71,6 +77,7 @@ save_file($items);
 							
 							<?php
         						var_dump($_POST);
+        						var_dump($_GET);
 							?>
 						</p>
 						<p>
