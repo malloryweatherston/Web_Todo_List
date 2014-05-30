@@ -5,11 +5,12 @@ $items = [];
 
 
 $filename = 'data/list.txt'; 
+$error_message = '';
+
 
 //function to open a file 
 function add_file($filename) {
-    $items = [];
-    $filename = 'data/list.txt';
+    $items = []; 
     $filesize = filesize($filename);
     $read = fopen($filename, "r"); 
     $string_list = trim(fread($read, $filesize));
@@ -21,8 +22,7 @@ function add_file($filename) {
 $items = add_file($filename);
 
 //function to save file
-function save_file($items) {
-    $filename = 'data/list.txt';
+function save_file($filename, $items) {
     $handle = fopen($filename, 'w');
     foreach ($items as $item) {
         fwrite($handle, $item . PHP_EOL);
@@ -34,31 +34,40 @@ function save_file($items) {
 if(isset($_POST['Add_Item'])){
 	$newTodo = $_POST['Add_Item'];
 	$items[] = $newTodo; 
+	save_file($filename, $items); 
 }
 
-//calling save function to save items to list.txt once item is added
-save_file($items); 
+
 
 //checking if $_GET isset and then removing item from array	with unset
 if (isset($_GET['removeIndex'])) {
 	$removeIndex = $_GET['removeIndex'];
 	unset($items[$removeIndex]);
-}
+	save_file($filename, $items); 
 
-//calling save function to save items to list.txt once item is removed 
-save_file($items); 
+}
 
 
 // Verify there were uploaded files and no errors
 if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
+	if($_FILES['file1']['type'] == 'text/plain') {
     // Set the destination directory for uploads
     $upload_dir = '/vagrant/sites/todo.dev/public/uploads/';
     // Grab the filename from the uploaded file by using basename
-    $filename = basename($_FILES['file1']['name']);
+    $uploaded_filename = basename($_FILES['file1']['name']);
     // Create the saved filename using the file's original name and our upload directory
-    $saved_filename = $upload_dir . $filename;
+    $saved_filename = $upload_dir . $uploaded_filename;
     // Move the file from the temp location to our uploads directory
     move_uploaded_file($_FILES['file1']['tmp_name'], $saved_filename);
+	//Open/Upload a new file
+	$uploaded_file = add_file($saved_filename);
+	//Merge original array with new uploaded files
+	$items = array_merge($items, $uploaded_file);
+	//Error echoed if file type is not "text/plain"
+	}else {
+		$error_message = "ERROR: File Type Must be text/plain." .PHP_EOL;
+	 }
+	save_file($filename, $items); 
 }
 
 // Check if we saved a file
@@ -66,14 +75,6 @@ if (isset($saved_filename)) {
     // If we did, show a link to the uploaded file
     echo "<p>You can download your file <a href='/uploads/{$filename}'>here</a>.</p>";
 }
-		
-	$uploaded_file = add_file($saved_filename);
-
-	$ext = pathinfo($filename, PATHINFO_EXTENSION);
-	$allowed = array('txt');
-	if(in_array($ext, $allowed)){
-	$items = array_merge($items, $uploaded_file);
-	}
     
 
 
@@ -90,6 +91,11 @@ if (isset($saved_filename)) {
 	</head>
 	<body>
 		<h2>TODO List</h2>
+			<?php 
+			if(!empty($error_message)) {
+				echo "<p>{$error_message}</p>";
+			}
+			?>
 		<ul>
 			<?php 
 				foreach($items as $key => $item) {
