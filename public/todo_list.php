@@ -90,17 +90,17 @@ if (isset($saved_filename)) {
 		<title>TODO List</title>
 	</head>
 	<body>
-		<h2>TODO List</h2>
+		<h1>TODO List</h1>
 			<? if(!empty($error_message)) : ?>
 				 <p><?= $error_message?></p>
 			<? endif; ?>
 		<ul>
 			<? foreach($items as $key => $item) : ?>
-					<li><?= $item . "<a href=\"todo_list.php?removeIndex={$key}\"> Remove Item</a>";?></li>
+					<li><?= htmlspecialchars(strip_tags($item)). "<a href=\"todo_list.php?removeIndex={$key}\"> Remove Item</a>";?></li>
 			<? endforeach; ?>
 		</ul>
 
-		<h3>Add an Item to the TODO List</h3>
+		<h2>Add an Item to the TODO List</h2>
 
 			<form method="POST" action="/todo_list.php">
 				<p>
@@ -112,7 +112,7 @@ if (isset($saved_filename)) {
 				</p>
 				</form>
 
-		<h1>Upload File</h1>
+		<h2>Upload File</h2>
 
 			<form method="POST" enctype="multipart/form-data" action="/todo_list.php">
     			<p>
