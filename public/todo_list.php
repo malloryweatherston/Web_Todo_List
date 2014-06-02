@@ -1,4 +1,4 @@
-<?php
+<?
 
 $items = [];
 //load contents of file
@@ -66,7 +66,7 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
 	//Error echoed if file type is not "text/plain"
 	}else {
 		$error_message = "ERROR: File Type Must be text/plain." .PHP_EOL;
-	 }
+	}
 	save_file($filename, $items); 
 }
 
@@ -91,46 +91,37 @@ if (isset($saved_filename)) {
 	</head>
 	<body>
 		<h2>TODO List</h2>
-			<?php 
-			if(!empty($error_message)) {
-				echo "<p>{$error_message}</p>";
-			}
-			?>
+			<? if(!empty($error_message)) : ?>
+				 <p><?= $error_message?></p>
+			<? endif; ?>
 		<ul>
-			<?php 
-				foreach($items as $key => $item) {
-					echo "<li>{$item}<a href=\"todo_list.php?removeIndex={$key}\"> Remove Item </a></li>" . PHP_EOL;
-				}
-			?>
+			<? foreach($items as $key => $item) : ?>
+					<li><?= $item . "<a href=\"todo_list.php?removeIndex={$key}\"> Remove Item</a>";?></li>
+			<? endforeach; ?>
 		</ul>
 
 		<h3>Add an Item to the TODO List</h3>
 
-					<form method="POST" action="/todo_list.php">
-						<p>
-							<label for="Add_Item">Item:</label>
-							<input id="Add_Item" name="Add_Item" type="text" placeholder="Enter New Item Here"> 
-							
-							<?php
-        						var_dump($_POST);
-        						var_dump($_GET);
-							?>
-						</p>
-						<p>
-						 <button type="Submit">Add</button>
-						</p>
-					</form>
+			<form method="POST" action="/todo_list.php">
+				<p>
+					<label for="Add_Item">Item:</label>
+					<input id="Add_Item" name="Add_Item" type="text" placeholder="Enter New Item Here"> 
+				</p>
+				<p>
+					<button type="Submit">Add</button>
+				</p>
+				</form>
 
 		<h1>Upload File</h1>
 
-					<form method="POST" enctype="multipart/form-data" action="/todo_list.php">
-    					<p>
-        					<label for="file1">File to upload: </label>
-        					<input type="file" id="file1" name="file1">
-    					</p>
-   						 <p>
-        				<input type="submit" value="Upload">
-        				</p>
-					</form>
-			</body>	
-	<html>
+			<form method="POST" enctype="multipart/form-data" action="/todo_list.php">
+    			<p>
+        			<label for="file1">File to upload: </label>
+        			<input type="file" id="file1" name="file1">
+    			</p>
+   				<p>
+        			<input type="submit" value="Upload">
+        		</p>
+			</form>
+	</body>	
+<html>
