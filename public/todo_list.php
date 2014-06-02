@@ -31,7 +31,7 @@ function save_file($filename, $items) {
 }
 
 //checking if $_POST isset and then adding item to array	
-if(isset($_POST['Add_Item'])){
+if(!empty($_POST['Add_Item'])){
 	$newTodo = $_POST['Add_Item'];
 	$items[] = $newTodo; 
 	save_file($filename, $items); 
