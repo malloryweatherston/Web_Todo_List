@@ -1,0 +1,35 @@
+/* 
+this content is stored in a file named "site.css" 
+in a directory named "css" in the web root 
+*/
+
+.fancy-header {
+	color: #E84A54;
+    text-decoration: underline;
+    font-weight: bold;
+    text-shadow: 2px 2px #2c2e38;
+    
+}
+
+body {
+	background-color: #6CD6E8
+}
+
+ul { 
+	list-style: square;
+}
+
+body {
+	 font-family: Helvetica, Arial, Sans-Serif; 
+}
+
+a:hover {
+	color:#FFFFFF;
+}
+
+#retro  {
+	color: #E84A54;
+	text-shadow: 3px 3px 0px #2c2e38, 5px 5px 0px #5c5f72;
+	font: 50px 'Helvetica';
+	letter-spacing: 10px;
+}
