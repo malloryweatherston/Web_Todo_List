@@ -88,9 +88,12 @@ if (isset($saved_filename)) {
 	<head>
 		<meta charset="utf-8">
 		<title>TODO List</title>
+		 <link rel="stylesheet" href="/CSS/stylesheet.css">
 	</head>
 	<body>
-		<h1>TODO List</h1>
+		<div id="retro">
+		<h1 class="fancy-header">TODO List</h1>
+		</div>
 			<? if(!empty($error_message)) : ?>
 				 <p><?= $error_message?></p>
 			<? endif; ?>
@@ -99,8 +102,10 @@ if (isset($saved_filename)) {
 					<li><?= htmlspecialchars(strip_tags($item)). "<a href=\"todo_list.php?removeIndex={$key}\"> Remove Item</a>";?></li>
 			<? endforeach; ?>
 		</ul>
-
-		<h2>Add an Item to the TODO List</h2>
+		
+		
+		
+		<h2 class="fancy-header">Add an Item to the TODO List</h2>
 
 			<form method="POST" action="/todo_list.php">
 				<p>
@@ -112,7 +117,7 @@ if (isset($saved_filename)) {
 				</p>
 				</form>
 
-		<h2>Upload File</h2>
+		<h2 class="fancy-header">Upload File</h2>
 
 			<form method="POST" enctype="multipart/form-data" action="/todo_list.php">
     			<p>
@@ -123,5 +128,6 @@ if (isset($saved_filename)) {
         			<input type="submit" value="Upload">
         		</p>
 			</form>
+		
 	</body>	
 <html>
