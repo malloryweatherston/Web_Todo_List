@@ -1,40 +1,43 @@
 <?
 
-$items = [];
-//load contents of file
-
-
 $filename = 'data/list.txt'; 
+//load contents of file
+require_once('classes/filestore.php');
+$fs = new Filestore($filename);
+
+$items = [];
+
+
 $error_message = '';
 
 
 //function to open a file 
-function add_file($filename) {
-    $items = []; 
-    $filesize = filesize($filename);
-    $read = fopen($filename, "r"); 
-    $string_list = trim(fread($read, $filesize));
-    $items = explode(PHP_EOL, $string_list);
-    fclose($read);
-    return $items;
-}
+// function add_file($filename) {
+//     $items = []; 
+//     $filesize = filesize($filename);
+//     $read = fopen($filename, "r"); 
+//     $string_list = trim(fread($read, $filesize));
+//     $items = explode(PHP_EOL, $string_list);
+//     fclose($read);
+//     return $items;
+// }
 
-$items = add_file($filename);
+$fs->add_file($filename);
 
 //function to save file
-function save_file($filename, $items) {
-    $handle = fopen($filename, 'w');
-    foreach ($items as $item) {
-        fwrite($handle, $item . PHP_EOL);
-    }
-    fclose($handle);
-}
+// function save_file($filename, $items) {
+//     $handle = fopen($filename, 'w');
+//     foreach ($items as $item) {
+//         fwrite($handle, $item . PHP_EOL);
+//     }
+//     fclose($handle);
+// }
 
 //checking if $_POST isset and then adding item to array	
 if(!empty($_POST['Add_Item'])){
 	$newTodo = $_POST['Add_Item'];
 	$items[] = $newTodo; 
-	save_file($filename, $items); 
+	$fs->save_file($filename, $items); 
 }
 
 
@@ -43,7 +46,7 @@ if(!empty($_POST['Add_Item'])){
 if (isset($_GET['removeIndex'])) {
 	$removeIndex = $_GET['removeIndex'];
 	unset($items[$removeIndex]);
-	save_file($filename, $items); 
+	$fs->save_file($filename, $items); 
 
 }
 
@@ -67,7 +70,7 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
 	}else {
 		$error_message = "ERROR: File Type Must be text/plain." .PHP_EOL;
 	}
-	save_file($filename, $items); 
+	$fs->save_file($filename, $items); 
 }
 
 // Check if we saved a file
