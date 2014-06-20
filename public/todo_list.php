@@ -22,7 +22,7 @@ $error_message = '';
 //     return $items;
 // }
 
-$fs->add_file($filename);
+$fs->read($filename);
 
 //function to save file
 // function save_file($filename, $items) {
@@ -34,11 +34,17 @@ $fs->add_file($filename);
 // }
 
 //checking if $_POST isset and then adding item to array	
-if(!empty($_POST['Add_Item'])){
+//if(empty($_POST['Add_Item'])){throw new Exception('This post is empty!');
+
+if(!empty($_POST)){
+	if(empty($_POST['Add_Item']) || (strlen('Add_Item') > 240)){
+		throw new Exception('This post is empty or has more than 240 characters!');
+	}
 	$newTodo = $_POST['Add_Item'];
 	$items[] = $newTodo; 
-	$fs->save_file($filename, $items); 
+	$fs->write($items); 
 }
+	//if(empty($_POST['Add_Item'])){throw new Exception('This post is empty!');}
 
 
 
@@ -46,7 +52,7 @@ if(!empty($_POST['Add_Item'])){
 if (isset($_GET['removeIndex'])) {
 	$removeIndex = $_GET['removeIndex'];
 	unset($items[$removeIndex]);
-	$fs->save_file($filename, $items); 
+	$fs->write($filename, $items); 
 
 }
 
@@ -70,7 +76,7 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
 	}else {
 		$error_message = "ERROR: File Type Must be text/plain." .PHP_EOL;
 	}
-	$fs->save_file($filename, $items); 
+	$fs->write($filename, $items); 
 }
 
 // Check if we saved a file
