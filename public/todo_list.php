@@ -5,7 +5,6 @@ $filename = 'data/list.txt';
 require_once('classes/filestore.php');
 $fs = new Filestore($filename);
 
-$items = [];
 
 
 $error_message = '';
@@ -22,7 +21,7 @@ $error_message = '';
 //     return $items;
 // }
 
-$fs->read($filename);
+$items = $fs->read();
 
 //function to save file
 // function save_file($filename, $items) {
@@ -35,15 +34,21 @@ $fs->read($filename);
 
 //checking if $_POST isset and then adding item to array	
 //if(empty($_POST['Add_Item'])){throw new Exception('This post is empty!');
-
-if(!empty($_POST)){
-	if(empty($_POST['Add_Item']) || (strlen('Add_Item') > 240)){
-		throw new Exception('This post is empty or has more than 240 characters!');
+try{
+	if(!empty($_POST)){
+		if(empty($_POST['Add_Item']) || (strlen($_POST['Add_Item']) > 10)){
+			throw new Exception('This post is empty or has more than 240 characters!');
+		}
+		$newTodo = $_POST['Add_Item'];
+		$items[] = $newTodo; 
+		$fs->write($items);
 	}
-	$newTodo = $_POST['Add_Item'];
-	$items[] = $newTodo; 
-	$fs->write($items); 
-}
+} catch(Exception $e) {
+		//echo 'This post is empty or has more than 240 characters!';
+		$msg = $e->getMessage() . PHP_EOL;
+	}
+
+
 	//if(empty($_POST['Add_Item'])){throw new Exception('This post is empty!');}
 
 
@@ -52,7 +57,7 @@ if(!empty($_POST)){
 if (isset($_GET['removeIndex'])) {
 	$removeIndex = $_GET['removeIndex'];
 	unset($items[$removeIndex]);
-	$fs->write($filename, $items); 
+	$fs->write($items); 
 
 }
 
@@ -69,7 +74,8 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
     // Move the file from the temp location to our uploads directory
     move_uploaded_file($_FILES['file1']['tmp_name'], $saved_filename);
 	//Open/Upload a new file
-	$uploaded_file = add_file($saved_filename);
+	$upf = new Filestore($saved_filename);
+	$uploaded_file = $upf->read();
 	//Merge original array with new uploaded files
 	$items = array_merge($items, $uploaded_file);
 	//Error echoed if file type is not "text/plain"
@@ -100,6 +106,9 @@ if (isset($saved_filename)) {
 		 <link rel="stylesheet" href="/CSS/stylesheet.css">
 	</head>
 	<body>
+		<? if(isset($msg)) : ?>
+			<?= $msg; ?>
+		<? endif; ?>
 		<div id="retro">
 		<h1 class="fancy-header">TODO List</h1>
 		</div>
