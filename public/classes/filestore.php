@@ -2,44 +2,58 @@
 
 class Filestore {
 
-    public $filename = '';
+    protected $filename = ''; 
+    protected $is_csv = FALSE;
 
     public function __construct($filename = '') 
     {
         $this->filename = $filename;
+        $extension = substr($filename, -3);
+
+        if ($extension == 'csv')
+            { $this->is_csv == TRUE;
+
+            }else {
+                $this->is_csv == FALSE; 
+            }
 
     }
+
 
     /**
      * Returns array of lines in $this->filename
      */
-    function add_file($filename)
+    private function add_file()
     {
-        $items = []; 
+        $array = []; 
+
+        if (is_readable($this->filename) && filesize($this->filename)>0){
         $filesize = filesize($this->filename);
         $read = fopen($this->filename, "r"); 
         $string_list = trim(fread($read, $filesize));
         $items = explode(PHP_EOL, $string_list);
         fclose($read);
         return $items;
+        }
+        return $array;
     }
 
     /**
      * Writes each element in $array to a new line in $this->filename
      */
-    function save_file($filename, $items)
+    private function save_file($array)
     {
          $handle = fopen($this->filename, 'w');
-        foreach ($items as $item) {
-            fwrite($handle, $item . PHP_EOL);
+         foreach ($array as $arrays) {
+            fwrite($handle, $arrays . PHP_EOL);
         }
-        fclose($handle);
+    fclose($handle);
     }
 
     /**
      * Reads contents of csv $this->filename, returns an array
      */
-    function read_address_book()
+    private function read_address_book()
     {
         $entries = [];
             $handle = fopen($this->filename, 'r');
@@ -57,7 +71,7 @@ class Filestore {
     /**
      * Writes contents of $array to csv $this->filename
      */
-    function write_address_book($big_array)
+    private function write_address_book($big_array)
     {
         $handle = fopen($this->filename, 'w');
         foreach($big_array as $fields) {
@@ -68,4 +82,26 @@ class Filestore {
 
     }
 
+    public function read() {
+        if ($this->is_csv == TRUE){        
+            return $this->read_address_book(); 
+        }else {
+            return $this->add_file();
+        }
+
+    }
+
+
+    public function write($array) {
+        if ($this->is_csv == TRUE){        
+            $this->write_address_book($array); 
+        }else {
+            $this->save_file($array);
+        }
+
+    }
+
 }
+
+
+
