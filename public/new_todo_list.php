@@ -50,7 +50,7 @@ $items = $fs->read();
 
 
 
-	if(!empty($_POST)){
+	if(!empty($_POST['todo_item'])){
 		$dbc = new PDO('mysql:host=127.0.0.1;dbname=todo_db', 'mallory', 'malmal');
 
 		//Tell PDO to throw exceptions on error
@@ -64,7 +64,13 @@ $items = $fs->read();
 	   
 	    $stmt->execute();
 
-	} 
+	} else {
+		foreach ($_POST as $key => $value) 
+	       if (empty($value)) {
+	            echo "<h1>" . ucfirst($key) .  " is empty.</h1>";
+	    	}
+	}
+	
 	
 
 //checking if $_GET isset and then removing item from array	with unset
@@ -127,22 +133,26 @@ if (isset($saved_filename)) {
 			<? if(!empty($error_message)) : ?>
 				 <p><?= $error_message?></p>
 			<? endif; ?>
-		<table>
+			<table>
 				<table border='1'>
      		<tr>
-       			<td>ID</td>
-       			<td>TODO ITEMS</td>
+       			
+       			<td>Todo Item</item>
+
      		</tr>
-       <? foreach (getLists($dbc) as $row) : ?>
-                <tr>
-                    <? foreach($row as $item): ?>
-                        <td><?= htmlspecialchars(strip_tags($item));?></td>
+    
+                
+                    <? foreach(getLists($dbc) as $key => $item): ?>
+                     <tr>
+                        <td><?= htmlspecialchars(strip_tags($item['todo_item']));?> <button class="btn btn-danger btn-sm pull-right btn-remove"data-todo=<?= $item['id'];?>>Remove</button></td>
+                    <? var_dump($item); ?>
+                    </tr>
                     <? endforeach; ?>
-                </tr>
-      		 <? endforeach; ?>
+               
 			</table>
-		<a href="/national_parks.php?page=<?= $prevPage; ?>"> Previous</a>
-		<a href="/national_parks.php?page=<?= $nextPage;?>">Next</a>
+        
+		<a href="/new_todo_list.php?page=<?= $prevPage; ?>"> Previous</a>
+		<a href="/new_todo_list.php?page=<?= $nextPage;?>">Next</a>
 		
 		
 		<h2 class="fancy-header">Add an Item to the TODO List</h2>
@@ -156,6 +166,9 @@ if (isset($saved_filename)) {
 					<button type="Submit">Add</button>
 				</p>
 				</form>
+		<form id="removeForm" action="todo-db.php" method="post">
+   		 <input id="removeId" type="hidden" name="remove" value="">
+		</form>
 
 		<h2 class="fancy-header">Upload File</h2>
 
@@ -168,6 +181,19 @@ if (isset($saved_filename)) {
         			<input type="submit" value="Upload">
         		</p>
 			</form>
+			
+			<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+			
+			<script>
+			$('.btn-remove').click(function () {
+    		var todoId = $(this).data('todo');
+    		if (confirm('Are you sure you want to remove item ' + todoId + '?')) {
+       			 $('#remove-id').val(todoId);
+        		 $('#remove-form').submit();
+    			}
+			});
+
+			</script>
 		
 	</body>	
 <html>
