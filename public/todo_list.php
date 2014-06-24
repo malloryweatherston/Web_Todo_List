@@ -10,43 +10,26 @@ $fs = new Filestore($filename);
 $error_message = '';
 
 
-//function to open a file 
-// function add_file($filename) {
-//     $items = []; 
-//     $filesize = filesize($filename);
-//     $read = fopen($filename, "r"); 
-//     $string_list = trim(fread($read, $filesize));
-//     $items = explode(PHP_EOL, $string_list);
-//     fclose($read);
-//     return $items;
-// }
-
 $items = $fs->read();
 
-//function to save file
-// function save_file($filename, $items) {
-//     $handle = fopen($filename, 'w');
-//     foreach ($items as $item) {
-//         fwrite($handle, $item . PHP_EOL);
-//     }
-//     fclose($handle);
-// }
 
-//checking if $_POST isset and then adding item to array	
-//if(empty($_POST['Add_Item'])){throw new Exception('This post is empty!');
 try{
 	if(!empty($_POST)){
-		if(empty($_POST['Add_Item']) || (strlen($_POST['Add_Item']) > 10)){
+		if(empty($_POST['Add_Item']) || (strlen($_POST['Add_Item']) > 240)){
 			throw new Exception('This post is empty or has more than 240 characters!');
 		}
 		$newTodo = $_POST['Add_Item'];
 		$items[] = $newTodo; 
 		$fs->write($items);
 	}
-} catch(Exception $e) {
+//} catch(InvalidInputException $e) {
+		//echo 'This post is empty or has more than 240 characters!';
+		//$msg = $e->getMessage() . PHP_EOL;
+	}catch(Exception $e) {
 		//echo 'This post is empty or has more than 240 characters!';
 		$msg = $e->getMessage() . PHP_EOL;
 	}
+
 
 
 	//if(empty($_POST['Add_Item'])){throw new Exception('This post is empty!');}
