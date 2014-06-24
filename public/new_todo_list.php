@@ -150,9 +150,12 @@ if (isset($saved_filename)) {
                     <? endforeach; ?>
                
 			</table>
-        
+        <? if ($page > 1) : ?>
 		<a href="/new_todo_list.php?page=<?= $prevPage; ?>"> Previous</a>
+		<? endif; ?>
+		<? if ($page < $numPages) : ?>
 		<a href="/new_todo_list.php?page=<?= $nextPage;?>">Next</a>
+		<? endif; ?>
 		
 		
 		<h2 class="fancy-header">Add an Item to the TODO List</h2>
@@ -166,7 +169,7 @@ if (isset($saved_filename)) {
 					<button type="Submit">Add</button>
 				</p>
 				</form>
-		<form id="removeForm" action="todo-db.php" method="post">
+		<form id="removeForm" action="new_todo_list.php" method="POST">
    		 <input id="removeId" type="hidden" name="remove" value="">
 		</form>
 
