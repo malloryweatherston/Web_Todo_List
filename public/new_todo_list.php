@@ -70,6 +70,14 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
 	}
 }
 
+// Delete record
+// if post['remove'] is set
+// delete query with value of remove input
+if (isset($_POST['remove'])){
+	$stmt = $dbc->prepare("DELETE FROM todo_list WHERE id = :id ");
+	$stmt->bindValue(':id', $_POST['remove'], PDO::PARAM_INT); 
+	$stmt->execute();
+}
 
 function getLists($dbc) {
 // Bring the $dbc variable into scope and Create Limit and offset
@@ -150,8 +158,9 @@ $prevPage = $page - 1;
 					<button type="Submit">Add</button>
 				</p>
 				</form>
+		
 		<form id="removeForm" action="new_todo_list.php" method="POST">
-   		 <input id="removeId" type="hidden" name="remove" value="">
+   			<input id="removeId" type="hidden" name="remove" value="">
 		</form>
 
 		<h2 class="fancy-header">Upload File</h2>
@@ -169,14 +178,13 @@ $prevPage = $page - 1;
 			<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 			
 			<script>
-			console.log('here');
+
 			$('.btn-remove').click(function () {
-    			console.log('here');
     			var todoId = $(this).data('todo');
 
     		if (confirm('Are you sure you want to remove item ' + todoId + '?')) {
-       			 $('#remove-id').val(todoId);
-        		 $('#remove-form').submit();
+       			 $('#removeId').val(todoId);
+        		 $('#removeForm').submit();
     			}
 			});
 
