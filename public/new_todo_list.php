@@ -40,7 +40,7 @@ $items = $fs->read();
 	    	}
 	}
 	
-$todos = getLists($dbc);
+
 
 
 // Verify there were uploaded files and no errors
@@ -79,6 +79,8 @@ if (isset($_POST['remove'])){
 	$stmt->execute();
 }
 
+
+
 function getLists($dbc) {
 // Bring the $dbc variable into scope and Create Limit and offset
 	$page = getOffset(); 
@@ -90,6 +92,8 @@ function getLists($dbc) {
     $stmt = $stmt->fetchAll((PDO::FETCH_ASSOC));
     return $stmt;
 }
+
+$todos = getLists($dbc);
 
 //Create Function to get an offset for each page 
 function getOffset(){
