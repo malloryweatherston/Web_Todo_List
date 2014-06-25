@@ -10,6 +10,67 @@ $filename = 'data/list.txt';
 require_once('classes/filestore.php');
 $fs = new Filestore($filename);
 
+
+
+$error_message = '';
+
+
+$items = $fs->read();
+
+
+
+	if(!empty($_POST['todo_item'])){
+		$dbc = new PDO('mysql:host=127.0.0.1;dbname=todo_db', 'mallory', 'malmal');
+
+		//Tell PDO to throw exceptions on error
+		$dbc->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+		$stmt = $dbc->prepare("INSERT INTO todo_list(todo_item) VALUES (:todo_item)");
+
+
+		$stmt->bindValue(':todo_item', $_POST['todo_item'], PDO::PARAM_STR);
+		
+	   
+	    $stmt->execute();
+
+	} else {
+		foreach ($_POST as $key => $item) 
+	       if (empty($item)) {
+	            echo "<h1>" . ucfirst($key) .  " is empty.</h1>";
+	    	}
+	}
+	
+$todos = getLists($dbc);
+
+
+// Verify there were uploaded files and no errors
+if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
+	if($_FILES['file1']['type'] == 'text/plain') {
+    // Set the destination directory for uploads
+    $upload_dir = '/vagrant/sites/todo.dev/public/uploads/';
+    // Grab the filename from the uploaded file by using basename
+    $uploaded_filename = basename($_FILES['file1']['name']);
+    // Create the saved filename using the file's original name and our upload directory
+    $saved_filename = $upload_dir . $uploaded_filename;
+    // Move the file from the temp location to our uploads directory
+    move_uploaded_file($_FILES['file1']['tmp_name'], $saved_filename);
+	//Open/Upload a new file
+	$upf = new Filestore($saved_filename);
+	$uploaded_file = $upf->read();
+	var_dump($uploaded_file);
+	//Merge original array with new uploaded files
+	foreach ($uploaded_file as $newitem) {
+		$stmt = $dbc->prepare("INSERT INTO todo_list(todo_item) VALUES (:newitem)");
+		$stmt->bindValue(':newitem', $newitem, PDO::PARAM_STR);
+		$stmt->execute();
+
+	}
+}else {
+	$error_message = "ERROR: File Type Must be text/plain." .PHP_EOL;
+	}
+}
+
+
 function getLists($dbc) {
 // Bring the $dbc variable into scope and Create Limit and offset
 	$page = getOffset(); 
@@ -42,78 +103,6 @@ $prevPage = $page - 1;
 
 
 
-
-$error_message = '';
-
-
-$items = $fs->read();
-
-
-
-	if(!empty($_POST['todo_item'])){
-		$dbc = new PDO('mysql:host=127.0.0.1;dbname=todo_db', 'mallory', 'malmal');
-
-		//Tell PDO to throw exceptions on error
-		$dbc->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-		$stmt = $dbc->prepare("INSERT INTO todo_list(todo_item) VALUES (:todo_item)");
-
-
-		$stmt->bindValue(':todo_item', $_POST['todo_item'], PDO::PARAM_STR);
-		
-	   
-	    $stmt->execute();
-
-	} else {
-		foreach ($_POST as $key => $value) 
-	       if (empty($value)) {
-	            echo "<h1>" . ucfirst($key) .  " is empty.</h1>";
-	    	}
-	}
-	
-	
-
-//checking if $_GET isset and then removing item from array	with unset
-if (isset($_GET['removeIndex'])) {
-	$removeIndex = $_GET['removeIndex'];
-	unset($items[$removeIndex]);
-	$fs->write($items); 
-
-}
-
-
-// Verify there were uploaded files and no errors
-if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
-	if($_FILES['file1']['type'] == 'text/plain') {
-    // Set the destination directory for uploads
-    $upload_dir = '/vagrant/sites/todo.dev/public/uploads/';
-    // Grab the filename from the uploaded file by using basename
-    $uploaded_filename = basename($_FILES['file1']['name']);
-    // Create the saved filename using the file's original name and our upload directory
-    $saved_filename = $upload_dir . $uploaded_filename;
-    // Move the file from the temp location to our uploads directory
-    move_uploaded_file($_FILES['file1']['tmp_name'], $saved_filename);
-	//Open/Upload a new file
-	$upf = new Filestore($saved_filename);
-	$uploaded_file = $upf->read();
-	//Merge original array with new uploaded files
-	$items = array_merge($items, $uploaded_file);
-	//Error echoed if file type is not "text/plain"
-	}else {
-		$error_message = "ERROR: File Type Must be text/plain." .PHP_EOL;
-	}
-	$fs->write($filename, $items); 
-}
-
-// Check if we saved a file
-if (isset($saved_filename)) {
-    // If we did, show a link to the uploaded file
-    echo "<p>You can download your file <a href='/uploads/{$filename}'>here</a>.</p>";
-}
-    
-
-
-
 ?>
 
 
@@ -134,20 +123,12 @@ if (isset($saved_filename)) {
 				 <p><?= $error_message?></p>
 			<? endif; ?>
 			<table>
-				<table border='1'>
-     		<tr>
-       			
-       			<td>Todo Item</item>
-
-     		</tr>
-    
                 
-                    <? foreach(getLists($dbc) as $key => $item): ?>
+            	<? foreach($todos as $item): ?>
                      <tr>
-                        <td><?= htmlspecialchars(strip_tags($item['todo_item']));?> <button class="btn btn-danger btn-sm pull-right btn-remove"data-todo=<?= $item['id'];?>>Remove</button></td>
-                    <? var_dump($item); ?>
+                        <td><?= htmlspecialchars(strip_tags($item['todo_item']));?> <button class="btn-remove"data-todo="<?= $item['id'];?>">Remove</button></td>
                     </tr>
-                    <? endforeach; ?>
+                <? endforeach; ?>
                
 			</table>
         <? if ($page > 1) : ?>
@@ -188,8 +169,11 @@ if (isset($saved_filename)) {
 			<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 			
 			<script>
+			console.log('here');
 			$('.btn-remove').click(function () {
-    		var todoId = $(this).data('todo');
+    			console.log('here');
+    			var todoId = $(this).data('todo');
+
     		if (confirm('Are you sure you want to remove item ' + todoId + '?')) {
        			 $('#remove-id').val(todoId);
         		 $('#remove-form').submit();
